@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Main where
 
 import qualified Data.Map.Strict               as Map
@@ -26,7 +27,7 @@ main = do
       pn <- getProgName
       die $ "Usage: " ++ pn ++ "<version> <filename>"
 
-constructGraph :: String -> UnweighedGraph
+constructGraph :: String -> UnweightedGraph
 constructGraph = Map.fromList . map extractLine . lines
 
 extractLine :: String -> (Int, [Int])

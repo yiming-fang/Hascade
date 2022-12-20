@@ -37,6 +37,7 @@ library
       base >=4.7 && <5
     , containers
     , parallel
+    , random
   default-language: Haskell2010
 
 executable hascade-exe
@@ -51,6 +52,7 @@ executable hascade-exe
     , containers
     , hascade
     , parallel
+    , random
   default-language: Haskell2010
 
 test-suite hascade-test
@@ -66,4 +68,5 @@ test-suite hascade-test
     , containers
     , hascade
     , parallel
+    , random
   default-language: Haskell2010

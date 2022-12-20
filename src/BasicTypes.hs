@@ -5,7 +5,7 @@ import qualified Data.Map.Strict as Map
 type Vertex = Int
 type Weight = Float
 
-type UnweighedGraph = Map.Map Vertex [Vertex]
+type UnweightedGraph = Map.Map Vertex [Vertex]
 type WeightedGraph = Map.Map Vertex [(Vertex, Weight)]
 
 
