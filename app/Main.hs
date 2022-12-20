@@ -7,6 +7,9 @@ import           System.Environment             ( getArgs
                                                 )
 import           System.Exit                    ( die )
 import BasicTypes
+import qualified Data.Set                      as Set
+
+import Solver
 
 main :: IO ()
 main = do
@@ -18,10 +21,10 @@ main = do
       case version of
         "sequential" -> do
           print version
-          print $ length $ bcSolver inputGraph
-        "parallel" -> do
-          print version
-          print $ length $ bcSolverPar inputGraph
+          greedySolver inputGraph Set.empty 5 0.01 1000 >>= print
+        -- "parallel" -> do
+        --   print version
+        --   print $ length $ bcSolverPar inputGraph
         _ -> die "Usage: Choose correct version (sequential / parallel)"
     _ -> do
       pn <- getProgName
