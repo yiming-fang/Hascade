@@ -21,7 +21,7 @@ main = do
       case version of
         "sequential" -> do
           print version
-          print $ greedySolver inputGraph Set.empty 1 0.99 10
+          print $ greedySolver inputGraph Set.empty 1 0.99 100
         "parallel" -> do
           print version
           -- print $ length $ bcSolverPar inputGraph

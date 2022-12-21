@@ -25,30 +25,30 @@ import           System.Random                  ( randomIO )
 
 
 greedySolver
-      :: UnweightedGraph -> Set Vertex -> Int -> Float -> Int -> Set Vertex
+      :: Map.Map Int [Int] -> Set Int -> Int -> Float -> Int -> Set Int
 greedySolver graph vSet k thresh mcTrials
       | k == 0
       = vSet
       | otherwise
-      = let runMC :: Vertex -> (Float, Vertex)
+      = let runMC :: Int -> (Float, Int)
             runMC = monteCarlo graph vSet buffer
 
-            runChunk :: [Vertex] -> [(Float, Vertex)]
+            runChunk :: [Int] -> [(Float, Int)]
             runChunk vs = map runMC vs -- `using` parList rdeepseq
 
-            findMaxV :: [(Float, Vertex)] -> (Float, Vertex) -> Vertex
+            findMaxV :: [(Float, Int)] -> (Float, Int) -> Int
             findMaxV [] acc = snd acc
             findMaxV (x : xs) acc | fst x > fst acc = findMaxV xs x
                                   | otherwise       = findMaxV xs acc
 
             buffer      = replicate mcTrials thresh
             candidateVs = Map.keys graph
-            candidateChunks = split 100 candidateVs
+            candidateChunks = split 10 candidateVs
 
-            -- scores      = map runChunk candidateChunks `using` parList rseq
+            -- scores      = map runChunk candidateChunks `using` parList rdeepseq
             -- vMax        = findMaxV (concat scores) (0, -1)
 
-            scores      = map runMC candidateVs `using` parList rpar
+            scores      = map runMC candidateVs `using` parList rseq
             vMax        = findMaxV scores (0, -1)
             
             vSet'       = Set.insert vMax vSet
@@ -64,13 +64,13 @@ chunk _ [] = []
 chunk n xs = let (as, bs) = splitAt n xs in as : chunk n bs
 
 
--- getChunks :: Set Vertex -> [Float] -> Int -> [(Set Vertex, Float)]
+-- getChunks :: Set Int -> [Float] -> Int -> [(Set Int, Float)]
 -- getChunks vs threshs size = 
 --       let vlist = Set.toList vs
 
 
 monteCarloV1
-      :: UnweightedGraph -> Set Vertex -> [Float] -> Vertex -> (Float, Vertex)
+      :: Map.Map Int [Int] -> Set Int -> [Float] -> Int -> (Float, Int)
 monteCarloV1 graph vSet ps vNew = (mean, vNew)
    where
       vs   = Set.insert vNew vSet
@@ -78,14 +78,14 @@ monteCarloV1 graph vSet ps vNew = (mean, vNew)
       mean = sum lens / realToFrac (length lens)
 
 monteCarlo
-      :: UnweightedGraph -> Set Vertex -> [Float] -> Vertex -> (Float, Vertex)
+      :: Map.Map Int [Int] -> Set Int -> [Float] -> Int -> (Float, Int)
 monteCarlo graph vSet ps vNew = (mean, vNew)
    where
       vs  = Set.insert vNew vSet
-      pss = split 5 ps
+      pss = split 2 ps
 
       meansWithSizes =
-            map (monteCarloChunk graph vs) pss  -- `using` parList rdeepseq
+            map (monteCarloChunk graph vs) pss `using` parList rdeepseq
 
       totalSum  = foldr ((+) . \(a, b) -> a + realToFrac b) 0 meansWithSizes
       totalSize = foldr ((+) . snd) 0 meansWithSizes
@@ -93,14 +93,14 @@ monteCarlo graph vSet ps vNew = (mean, vNew)
 
 
 
-monteCarloChunk :: UnweightedGraph -> Set Vertex -> [Float] -> (Float, Int)
+monteCarloChunk :: Map.Map Int [Int] -> Set Int -> [Float] -> (Float, Int)
 monteCarloChunk graph vSet ps = (mean, length ps)
    where
       lens = map (independentCascade graph vSet 0) ps
       mean = sum lens / realToFrac (length lens)
 
 
-independentCascade :: UnweightedGraph -> Set Vertex -> Int -> Float -> Float
+independentCascade :: Map.Map Int [Int] -> Set Int -> Int -> Float -> Float
 independentCascade graph vSet depth thresh
       | depth > 100 = 0
       | otherwise = if null newActiveSet
@@ -130,7 +130,7 @@ randSeq :: Int -> [Float]
 randSeq k = unsafePerformIO (replicateM k (randomIO :: IO Float))
 
 
-tryActivate :: Set Vertex -> Float -> Set Vertex
+tryActivate :: Set Int -> Float -> Set Int
 tryActivate vs thresh = Set.fromList newActiveVs
    where
       strengths   = randSeq (length vs)
@@ -141,9 +141,9 @@ tryActivate vs thresh = Set.fromList newActiveVs
       newActiveVs = map snd newActive -- `using` parList rdeepseq
 
 
-getNeiborSet :: UnweightedGraph -> Set Vertex -> Set Vertex
+getNeiborSet :: Map.Map Int [Int] -> Set Int -> Set Int
 getNeiborSet graph vSet = Set.fromList newSets
    where
-      findChildren :: Vertex -> [Vertex]
+      findChildren :: Int -> [Int]
       findChildren v = Data.Maybe.fromMaybe [] (Map.lookup v graph)
       newSets = concatMap findChildren $ Set.toList vSet
