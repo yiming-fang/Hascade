@@ -21,10 +21,10 @@ main = do
       case version of
         "sequential" -> do
           print version
-          greedySolver inputGraph Set.empty 5 0.01 1000 >>= print
-        -- "parallel" -> do
-        --   print version
-        --   print $ length $ bcSolverPar inputGraph
+          print $ greedySolver inputGraph Set.empty 1 0.5 1000
+        "parallel" -> do
+          print version
+          -- print $ length $ bcSolverPar inputGraph
         _ -> die "Usage: Choose correct version (sequential / parallel)"
     _ -> do
       pn <- getProgName

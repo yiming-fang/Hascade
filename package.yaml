@@ -35,6 +35,10 @@ ghc-options:
 - -Wmissing-home-modules
 - -Wpartial-fields
 - -Wredundant-constraints
+- -threaded
+- -rtsopts
+- -with-rtsopts=-N
+- -eventlog
 
 library:
   source-dirs: src
@@ -47,6 +51,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -eventlog
+    - -Wall
     dependencies:
     - hascade
 
@@ -58,5 +64,7 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -eventlog
+    - -Wall
     dependencies:
     - hascade
