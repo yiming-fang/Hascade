@@ -15,11 +15,10 @@ main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [num_cores, filename] -> do
+    [k, filename] -> do
       contents <- readFile filename
       let inputGraph = constructGraph contents
-      print num_cores
-      print $ greedySolver inputGraph Set.empty 1 0.5 100
+      print $ greedySolver inputGraph Set.empty (read k) 0.1 100
     _ -> do
       pn <- getProgName
       die $ "Usage: " ++ pn ++ "<num_cores> <filename>"

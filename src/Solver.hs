@@ -69,7 +69,7 @@ monteCarloV1
 monteCarloV1 graph vSet ps vNew = (mean, vNew)
    where
       vs   = Set.insert vNew vSet
-      lens = map (independentCascade graph vs 0) ps -- `using` parBuffer 10 rseq
+      lens = map (independentCascade graph vs 0) ps `using` parList rdeepseq
       mean = sum lens / realToFrac (length lens)
 
 
