@@ -18,7 +18,7 @@ main = do
     [k, filename] -> do
       contents <- readFile filename
       let inputGraph = constructGraph contents
-      print $ greedySolver inputGraph Set.empty (read k) 0.1 100
+      print $ greedySolver inputGraph Set.empty (read k) 0.5 1000
     _ -> do
       pn <- getProgName
       die $ "Usage: " ++ pn ++ "<num_cores> <filename>"

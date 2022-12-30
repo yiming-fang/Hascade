@@ -9,8 +9,6 @@ import           BasicTypes                     ( UnweightedGraph
 import           Control.Monad                  ( replicateM )
 import           Control.Parallel.Strategies    ( parList
                                                 , rdeepseq
-                                                -- , rpar
-                                                -- , rseq
                                                 , using
                                                 )
 import qualified Data.Map.Strict               as Map
@@ -44,11 +42,7 @@ greedySolver graph vSet k thresh mcTrials
             buffer      = replicate mcTrials thresh
             candidateVs = Map.keys graph
 
-            -- candidateChunks = split 10 candidateVs
-            -- scores      = map runChunk candidateChunks `using` parList rdeepseq
-            -- vMax        = findMaxV (concat scores) (0, -1)
-
-            scores      = map runMC candidateVs -- `using` parList rdeepseq
+            scores      = map runMC candidateVs
             vMax        = findMaxV scores (0, -1)
 
             vSet'       = Set.insert vMax vSet
@@ -62,15 +56,6 @@ split numChunks xs = chunk (length xs `quot` numChunks) xs
 chunk :: Int -> [a] -> [[a]]
 chunk _ [] = []
 chunk n xs = let (as, bs) = splitAt n xs in as : chunk n bs
-
-
-monteCarloV1
-      :: UnweightedGraph -> Set Vertex -> [Float] -> Int -> (Float, Vertex)
-monteCarloV1 graph vSet ps vNew = (mean, vNew)
-   where
-      vs   = Set.insert vNew vSet
-      lens = map (independentCascade graph vs 0) ps `using` parList rdeepseq
-      mean = sum lens / realToFrac (length lens)
 
 
 monteCarlo
@@ -94,7 +79,7 @@ monteCarlo graph vSet ps vNew = (mean, vNew)
 monteCarloChunk :: UnweightedGraph -> Set Vertex -> [Float] -> (Float, Vertex)
 monteCarloChunk graph vSet ps = (mean, length ps)
    where
-      lens = map (independentCascade graph vSet 0) ps -- `using` parList rseq
+      lens = map (independentCascade graph vSet 0) ps
       mean = sum lens / realToFrac (length lens)
 
 

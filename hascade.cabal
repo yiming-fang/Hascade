@@ -26,7 +26,6 @@ source-repository head
 library
   exposed-modules:
       BasicTypes
-      Lib
       Solver
   other-modules:
       Paths_hascade
