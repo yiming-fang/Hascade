@@ -2,6 +2,8 @@
 
 A massively parallel solver for the Influence Maximization problem, in the context of Independent Cascade models.
 
+For more information, please read https://github.com/yiming-fang/Hascade/blob/main/Hascade-report.pdf
+
 ### To run: 
 
 `stack run -- [k] data/wiki_adj_list_[size].txt +RTS -lf -N[cores] -s`
